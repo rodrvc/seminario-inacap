@@ -1,0 +1,29 @@
+{
+  "name": "proyecto-seminario",
+  "version": "1.0.0",
+  "description": "Seminario de titulo Inacap",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "dev": "node index",
+    "client": "cd client && npm start",
+    "server": "node index",
+    "client-install": "cd client && npm install",
+    "server-install": "npm install",
+    "install-all": "concurrently \"npm run client-install\" \"npm run server-install\"",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "deve": "nodemon --watch /index.js --watch /db.js"
+  },
+  "author": "Rodrigo Valladares",
+  "license": "ISC",
+  "dependencies": {
+    "all": "0.0.0",
+    "concurrently": "^5.1.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.6",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3",
+    "npm": "^6.14.4"
+  }
+}

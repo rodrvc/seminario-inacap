@@ -1,0 +1,17 @@
+ client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: react
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./client:/home/node/app/client
+      - ./client/node_modules:/home/node/app/client/node_modules
+    networks:
+      - app-network
+    
+

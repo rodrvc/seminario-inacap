@@ -1,0 +1,96 @@
+version: '3.6'
+
+services:
+  nodejs:
+    build:
+      context: ./server
+      dockerfile: Dockerfile-dev
+    image: nodejs
+    container_name: nodejs
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_USERNAME=$MONGO_USERNAME
+      - MONGO_PASSWORD=$MONGO_PASSWORD
+      - MONGO_HOSTNAME=db
+      - MONGO_PORT=$MONGO_PORT
+      - MONGO_DB=$MONGO_DB
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    ports:
+      - "8080:8080"
+     
+    volumes:
+      - './server:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    networks:
+      - app-network
+    # command: wait-for.sh db:27017 -- /home/node/app/node_modules/.bin/nodemon app.js
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   image: react
+  #   container_name: reactclient
+  #   restart: unless-stopped
+  #   env_file: .env
+  #   ports:
+  #     - "3000:3000"
+
+  #   volumes:
+  #     - .client/src:/home/node/app/client/src
+  #     - .client/node_modules:/home/node/app/client/node_modules
+  #     - .client/public:/home/node/app/client/public
+  #   networks:
+  #     - app-network
+  #   command: npm run start
+   
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile-dev
+    volumes:
+      - './client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+#    ports:
+#      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    depends_on:
+      - nodejs
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile-dev
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - nodejs
+      - client
+    
+ 
+  db:
+    image: mongo:4.1.8-xenial
+    container_name: db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    volumes:     
+      - dbdata:/var/lib/mongodb
+    networks:
+      - app-network  
+    
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  node_modules:  
